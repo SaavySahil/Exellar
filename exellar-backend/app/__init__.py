@@ -1,0 +1,104 @@
+import os
+from flask import Flask
+from flask_cors import CORS
+from .extensions import db, migrate
+from .config import config
+
+
+def create_app(config_name=None):
+    if config_name is None:
+        config_name = os.environ.get('FLASK_ENV', 'development')
+
+    app = Flask(__name__)
+    app.config.from_object(config.get(config_name, config['default']))
+
+    # Ensure upload folder exists
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'resumes'), exist_ok=True)
+    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'images'), exist_ok=True)
+
+    # Extensions
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    from flask import request, make_response
+
+    @app.before_request
+    def handle_options():
+        if request.method == 'OPTIONS':
+            origin = request.headers.get('Origin', '')
+            allowed = app.config.get('CORS_ORIGINS', [])
+            if origin in allowed:
+                resp = make_response('', 204)
+                resp.headers['Access-Control-Allow-Origin'] = origin
+                resp.headers['Access-Control-Allow-Credentials'] = 'true'
+                resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+                resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
+                resp.headers['Access-Control-Max-Age'] = '3600'
+                return resp
+
+    @app.after_request
+    def add_cors_headers(response):
+        origin = request.headers.get('Origin', '')
+        allowed = app.config.get('CORS_ORIGINS', [])
+        if origin in allowed:
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
+        return response
+
+    CORS(app, origins=app.config['CORS_ORIGINS'], supports_credentials=True)
+
+    # Register blueprints
+    from .routes.auth import auth_bp
+    from .routes.projects import projects_bp
+    from .routes.jobs import jobs_bp
+    from .routes.applications import applications_bp
+    from .routes.content import content_bp
+    from .routes.articles import articles_bp
+
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(projects_bp, url_prefix='/api')
+    app.register_blueprint(jobs_bp, url_prefix='/api')
+    app.register_blueprint(applications_bp, url_prefix='/api')
+    app.register_blueprint(content_bp, url_prefix='/api')
+    app.register_blueprint(articles_bp, url_prefix='/api')
+
+    # Serve uploaded files
+    from flask import send_from_directory
+
+    @app.route('/api/uploads/<path:filename>')
+    def serve_upload(filename):
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+    # Auto-seed admin user and content fields
+    with app.app_context():
+        db.create_all()
+        _seed_defaults()
+
+    return app
+
+
+def _seed_defaults():
+    from .models.admin import AdminUser
+    from .models.content import ContentField
+
+    # Seed admin user if none exists
+    if AdminUser.query.count() == 0:
+        admin = AdminUser(email='admin@exellar.co.in')
+        admin.set_password('Admin@123')
+        db.session.add(admin)
+
+    # Seed CMS content fields
+    default_fields = {
+        'home_hero_tagline': 'Building Excellence Since 1964',
+        'about_summary': 'Exellar Construction LLP is a Mumbai & Pune based construction company with over 60 years of experience.',
+        'projects_hero_tagline': 'Our Portfolio of Excellence',
+        'careers_hero_tagline': 'Build Your Career With Us',
+    }
+    for key, value in default_fields.items():
+        if not ContentField.query.get(key):
+            db.session.add(ContentField(key=key, value=value))
+
+    db.session.commit()

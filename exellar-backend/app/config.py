@@ -1,0 +1,29 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Base directory = exellar-backend/
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///exellar.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    _upload_env = os.environ.get('UPLOAD_FOLDER', 'uploads')
+    UPLOAD_FOLDER = _upload_env if os.path.isabs(_upload_env) else os.path.join(_BASE_DIR, _upload_env)
+    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))
+    JWT_EXPIRY_HOURS = int(os.environ.get('JWT_EXPIRY_HOURS', 24))
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
+    DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+
+class ProductionConfig(Config):
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
+config = {
+    'development': Config,
+    'production': ProductionConfig,
+    'default': Config
+}

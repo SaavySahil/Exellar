@@ -1,0 +1,53 @@
+# Python virtual environment
+exellar-backend/venv/
+exellar-backend/venv
+venv/
+exellar-backend/__pycache__/
+exellar-backend/**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Node modules
+exellar-admin/node_modules/
+exellar-admin/node_modules
+node_modules/
+
+# Database
+exellar-backend/instance/*.db
+*.db
+
+# Binary / document files
+*.pdf
+*.docx
+*.zip
+Exellar.zip
+
+# Large media (videos & heavy images) - use CDN instead
+*.mp4
+*.mov
+*.avi
+media/
+images/us-maryland-hero-banner.jpg
+
+# Tool internals / AI memory
+entities.json
+mempalace.yaml
+*.disabled
+
+# Editor / tool config (not project-specific)
+.cursorrules
+.windsurfrules
+.opencode.json
+.mcp.json
+.agents/
+.claude/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Backup files
+*.bak
+
+# Tool internals
+skills-lock.json

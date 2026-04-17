@@ -1,0 +1,41 @@
+.heading { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.sub { color: var(--text-muted); font-size: 13px; margin-bottom: 28px; }
+.muted { color: var(--text-muted); }
+
+.list { display: flex; flex-direction: column; gap: 2px; max-width: 720px; }
+
+.field {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px 24px;
+}
+
+.fieldMeta { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.fieldLabel { font-size: 14px; font-weight: 600; }
+.fieldKey { font-size: 11px; color: var(--text-muted); font-family: monospace; }
+
+.valueRow { display: flex; align-items: flex-start; gap: 16px; justify-content: space-between; }
+.value { font-size: 14px; color: var(--text-muted); flex: 1; line-height: 1.6; }
+.empty { color: var(--border); }
+
+.editBtn {
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  padding: 4px 14px; border-radius: 4px; font-size: 12px; white-space: nowrap;
+}
+.editBtn:hover { border-color: var(--primary); color: var(--primary); }
+
+.editRow { display: flex; flex-direction: column; gap: 10px; }
+.textarea {
+  background: var(--surface2); border: 1px solid var(--primary);
+  color: var(--text); padding: 10px 12px; border-radius: 6px;
+  width: 100%; outline: none; resize: vertical; font-size: 14px; line-height: 1.6;
+}
+.editActions { display: flex; gap: 10px; justify-content: flex-end; }
+.cancel {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text-muted); padding: 7px 16px; border-radius: 4px; font-size: 13px;
+}
+.save {
+  background: var(--primary); border: none; color: #1a1100;
+  padding: 7px 20px; border-radius: 4px; font-weight: 600; font-size: 13px;
+}
+.save:disabled { opacity: 0.5; cursor: not-allowed; }
