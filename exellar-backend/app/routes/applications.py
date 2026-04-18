@@ -53,3 +53,28 @@ def submit_application():
 # ── ADMIN ────────────────────────────────────────────────────────────────────
 
 @applications_bp.route('/admin/applications', methods=['GET'])
+@token_required
+def admin_list_applications(current_user):
+    apps = JobApplication.query.order_by(JobApplication.applied_at.desc()).all()
+    return jsonify([a.to_dict() for a in apps])
+
+
+@applications_bp.route('/admin/applications/<app_id>/resume', methods=['GET'])
+@token_required
+def download_resume(current_user, app_id):
+    record = JobApplication.query.get_or_404(app_id)
+    if not record.resume_path:
+        return jsonify({'error': 'No resume on file'}), 404
+    path = get_resume_path(record.resume_path)
+    if not os.path.exists(path):
+        return jsonify({'error': 'Resume file not found'}), 404
+    return send_file(path, as_attachment=True)
+
+
+@applications_bp.route('/admin/applications/<app_id>', methods=['DELETE'])
+@token_required
+def delete_application(current_user, app_id):
+    record = JobApplication.query.get_or_404(app_id)
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Deleted'})

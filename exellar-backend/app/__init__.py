@@ -74,8 +74,11 @@ def create_app(config_name=None):
 
     # Auto-seed admin user and content fields
     with app.app_context():
-        db.create_all()
-        _seed_defaults()
+        try:
+            db.create_all()
+            _seed_defaults()
+        except Exception as e:
+            app.logger.error(f'DB init error (non-fatal): {e}')
 
     return app
 
