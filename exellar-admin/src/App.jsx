@@ -11,12 +11,6 @@ import Applications from './pages/Applications.jsx'
 import Content from './pages/Content.jsx'
 import Articles from './pages/Articles.jsx'
 import ArticleForm from './pages/ArticleForm.jsx'
-import Articles from './pages/Articles.jsx'
-import ArticleForm from './pages/ArticleForm.jsx'
-import Articles from './pages/Articles.jsx'
-import ArticleForm from './pages/ArticleForm.jsx'
-import Articles from './pages/Articles.jsx'
-import ArticleForm from './pages/ArticleForm.jsx'
 
 function PrivateRoute({ children }) {
   const { token } = useAuth()
