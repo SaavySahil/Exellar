@@ -5,7 +5,7 @@ services:
     runtime: python
     rootDir: exellar-backend
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn "app:create_app()" --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    startCommand: gunicorn wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
     plan: free
     envVars:
       - key: FLASK_ENV

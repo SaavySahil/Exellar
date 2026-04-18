@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd exellar-admin && npm install && npm run build",
+  "outputDirectory": "exellar-admin/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "VITE_API_BASE": "https://exellar-api.onrender.com"
+  }
+}
