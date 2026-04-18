@@ -29,7 +29,10 @@ class Config:
     UPLOAD_FOLDER = _upload_env if os.path.isabs(_upload_env) else os.path.join(_BASE_DIR, _upload_env)
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))
     JWT_EXPIRY_HOURS = int(os.environ.get('JWT_EXPIRY_HOURS', 24))
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
+    CORS_ORIGINS = os.environ.get(
+        'CORS_ORIGINS',
+        'http://localhost:3000,http://localhost:5173,https://exellar-gray.vercel.app'
+    ).split(',')
     DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 
