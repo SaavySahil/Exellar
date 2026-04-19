@@ -85,8 +85,14 @@ def admin_create_project(current_user):
     if data.get('gallery'):
         project.set_gallery(data['gallery'])
 
-    db.session.add(project)
-    db.session.commit()
+    try:
+        db.session.add(project)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        from flask import current_app
+        current_app.logger.error(f'Project create error: {e}')
+        return jsonify({'error': str(e)}), 500
     return jsonify(project.to_dict(full=True)), 201
 
 
