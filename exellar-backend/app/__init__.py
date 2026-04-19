@@ -1,8 +1,28 @@
 import os
-from flask import Flask
+import re
+from flask import Flask, request, make_response
 from flask_cors import CORS
 from .extensions import db, migrate
 from .config import config
+
+# Origins always allowed regardless of env var
+_ALWAYS_ALLOWED = re.compile(
+    r'^https?://(localhost|127\.0\.0\.1)(:\d+)?$'
+    r'|^https://[\w-]+\.vercel\.app$'
+    r'|^https://[\w-]+\.pages\.dev$'
+    r'|^https://[\w-]+\.onrender\.com$'
+    r'|^https://[\w-]+\.github\.io$'
+    r'|^https://exellar\.co\.in$'
+)
+
+
+def _is_allowed_origin(origin):
+    if not origin:
+        return False
+    # Check regex patterns
+    if _ALWAYS_ALLOWED.match(origin):
+        return True
+    return False
 
 
 def create_app(config_name=None):
@@ -21,17 +41,13 @@ def create_app(config_name=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from flask import request, make_response
-
     @app.before_request
     def handle_options():
         if request.method == 'OPTIONS':
             origin = request.headers.get('Origin', '')
-            allowed = app.config.get('CORS_ORIGINS', [])
-            if origin in allowed:
+            if _is_allowed_origin(origin):
                 resp = make_response('', 204)
                 resp.headers['Access-Control-Allow-Origin'] = origin
-                resp.headers['Access-Control-Allow-Credentials'] = 'true'
                 resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
                 resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
                 resp.headers['Access-Control-Max-Age'] = '3600'
@@ -40,15 +56,11 @@ def create_app(config_name=None):
     @app.after_request
     def add_cors_headers(response):
         origin = request.headers.get('Origin', '')
-        allowed = app.config.get('CORS_ORIGINS', [])
-        if origin in allowed:
+        if _is_allowed_origin(origin):
             response.headers['Access-Control-Allow-Origin'] = origin
-            response.headers['Access-Control-Allow-Credentials'] = 'true'
             response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
             response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
         return response
-
-    CORS(app, origins=app.config['CORS_ORIGINS'], supports_credentials=True)
 
     # Register blueprints
     from .routes.auth import auth_bp
@@ -72,6 +84,11 @@ def create_app(config_name=None):
     def serve_upload(filename):
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+    # Health check endpoint
+    @app.route('/health')
+    def health():
+        return {'status': 'ok'}, 200
+
     # Auto-seed admin user and content fields
     with app.app_context():
         try:
@@ -87,13 +104,11 @@ def _seed_defaults():
     from .models.admin import AdminUser
     from .models.content import ContentField
 
-    # Seed admin user if none exists
     if AdminUser.query.count() == 0:
         admin = AdminUser(email='admin@exellar.co.in')
         admin.set_password('Admin@123')
         db.session.add(admin)
 
-    # Seed CMS content fields
     default_fields = {
         'home_hero_tagline': 'Building Excellence Since 1964',
         'about_summary': 'Exellar Construction LLP is a Mumbai & Pune based construction company with over 60 years of experience.',
