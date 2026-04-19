@@ -23,7 +23,7 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 280,
-        'connect_args': {'connect_timeout': 10},
+        'connect_args': {'connect_timeout': 30},
     }
     _upload_env = os.environ.get('UPLOAD_FOLDER', 'uploads')
     UPLOAD_FOLDER = _upload_env if os.path.isabs(_upload_env) else os.path.join(_BASE_DIR, _upload_env)

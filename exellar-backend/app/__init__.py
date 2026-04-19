@@ -89,13 +89,24 @@ def create_app(config_name=None):
     def health():
         return {'status': 'ok'}, 200
 
-    # Auto-seed admin user and content fields
+    # Auto-seed admin user and content fields — retry up to 3× for slow DB wakeup
+    import time
+
+    def _init_db():
+        for attempt in range(3):
+            try:
+                db.create_all()
+                _seed_defaults()
+                app.logger.info('DB initialized successfully')
+                return
+            except Exception as e:
+                app.logger.error(f'DB init attempt {attempt + 1}/3 failed: {e}')
+                if attempt < 2:
+                    time.sleep(5)
+        app.logger.error('DB init failed after 3 attempts — tables may not exist')
+
     with app.app_context():
-        try:
-            db.create_all()
-            _seed_defaults()
-        except Exception as e:
-            app.logger.error(f'DB init error (non-fatal): {e}')
+        _init_db()
 
     return app
 
