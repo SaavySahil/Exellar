@@ -1,5 +1,5 @@
 /**
- * config.js — Exellar API environment detection + animation reveal fallback
+ * config.js — Exellar API URL + nuclear visibility fix
  * Placed before </body> on every page.
  */
 ;(function () {
@@ -11,82 +11,31 @@
     ? 'http://localhost:5000'
     : 'https://exellar-api.onrender.com'
 
-  /* ── 2. Animation reveal fallback ────────────────────────────────────────
-     .anim-elem starts at opacity:0 — app.js adds .done to reveal them.
-     This fallback ensures every element becomes visible even if app.js
-     misses them (happens on inner pages due to scroll-trigger timing).
+  /* ── 2. NUCLEAR VISIBILITY FIX ──────────────────────────────────────────
+     The site CSS sets .anim-elem { opacity:0 } and JS is supposed to add
+     .done to reveal them via scroll. That JS fails on every page except
+     the homepage. Fix: force inline opacity:1 on every .anim-elem element
+     right now, bypassing the entire animation system.
+     Inline styles beat stylesheet rules (even !important), so this wins.
   ─────────────────────────────────────────────────────────────────────── */
-
-  function addDone(el, delay) {
-    if (el.classList.contains('done')) return
-    if (delay) {
-      setTimeout(function () { el.classList.add('done') }, delay)
-    } else {
-      el.classList.add('done')
+  function nukeHidden() {
+    var elems = document.querySelectorAll('.anim-elem')
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].style.opacity    = '1'
+      elems[i].style.transform  = 'none'
+      elems[i].style.visibility = 'visible'
     }
   }
 
-  /* Reveal all .anim-block children that are currently on-screen */
-  function revealInView() {
-    var vh = window.innerHeight
-    var blocks = document.querySelectorAll('.anim-block')
-    for (var b = 0; b < blocks.length; b++) {
-      var top = blocks[b].getBoundingClientRect().top
-      if (top < vh * 0.98) {                        // block is on screen
-        var kids = blocks[b].querySelectorAll('.anim-elem')
-        for (var k = 0; k < kids.length; k++) {
-          addDone(kids[k], k * 60)                   // stagger 60 ms
-        }
-      }
-    }
-  }
+  /* Run RIGHT NOW — config.js is at bottom of <body> so DOM is parsed */
+  nukeHidden()
 
-  /* Reveal orphan .anim-elem elements not inside any .anim-block */
-  function revealOrphans() {
-    var all = document.querySelectorAll('.anim-elem')
-    var vh  = window.innerHeight
-    for (var i = 0; i < all.length; i++) {
-      if (all[i].getBoundingClientRect().top < vh) addDone(all[i], 0)
-    }
-  }
+  /* Run again after 100 ms in case any elements were added by other scripts */
+  setTimeout(nukeHidden, 100)
 
-  function revealAll() {
-    var all = document.querySelectorAll('.anim-elem')
-    for (var i = 0; i < all.length; i++) addDone(all[i], 0)
-  }
+  /* Run again after full page load (images etc.) */
+  window.addEventListener('load', nukeHidden)
 
-  /* ── Fire order ──────────────────────────────────────────────────────── */
-
-  /* Pass 1 – immediately when this script executes (DOM already exists
-     because we're at the bottom of <body>) */
-  revealInView()
-  revealOrphans()
-
-  /* Pass 2 – 120 ms later: layout is stable, images starting to load */
-  setTimeout(function () {
-    revealInView()
-    revealOrphans()
-  }, 120)
-
-  /* Pass 3 – 600 ms deadline: catch anything the passes above missed */
-  setTimeout(function () {
-    revealInView()
-    revealOrphans()
-  }, 600)
-
-  /* Hard deadline – 1.5 s: force EVERYTHING visible regardless */
-  setTimeout(revealAll, 1500)
-
-  /* On every scroll: reveal newly in-view blocks */
-  window.addEventListener('scroll', function () {
-    revealInView()
-    revealOrphans()
-  }, { passive: true })
-
-  /* After images load: refresh positions and reveal again */
-  window.addEventListener('load', function () {
-    revealInView()
-    revealOrphans()
-    setTimeout(revealAll, 500)      /* final safety net after load */
-  })
+  /* Scroll: reveal any elements dynamically injected after load */
+  window.addEventListener('scroll', nukeHidden, { passive: true })
 })()

@@ -317,30 +317,14 @@ body,html{margin:0;padding:0;width:100%}body{color:#fff;font-weight:400}h1,h2,h3
 }
 
 
-/* ─── Exellar: animation reveal safety net ─────────────────────────────── */
-/* Ensure .done always wins, regardless of specificity battles               */
-.anim-block .anim-elem.done,
-.anim-elem.done {
+/* ─── Exellar: nuclear visibility override ─────────────────────────────── */
+/* The site hides content with .anim-elem { opacity:0 } and reveals via JS. */
+/* JS reveal fails on inner pages, so force everything visible via CSS too. */
+.anim-elem,
+.anim-block .anim-elem {
   opacity: 1 !important;
-  -webkit-transform: translate(0,0) !important;
-          transform: translate(0,0) !important;
+  -webkit-transform: none !important;
+          transform: none !important;
   visibility: visible !important;
-}
-
-/* CSS-only timed fallback: if JS never adds .done, reveal after 2 s        */
-@-webkit-keyframes exellar-reveal {
-  to { opacity: 1; -webkit-transform: translate(0,0); transform: translate(0,0); }
-}
-@keyframes exellar-reveal {
-  to { opacity: 1; -webkit-transform: translate(0,0); transform: translate(0,0); }
-}
-.anim-elem:not(.done) {
-  -webkit-animation: exellar-reveal 0.5s ease 0.4s forwards;
-          animation: exellar-reveal 0.5s ease 0.4s forwards;
-}
-/* Once .done is applied by JS, stop the CSS animation immediately           */
-.anim-elem.done {
-  -webkit-animation: none !important;
-          animation: none !important;
 }
 /* ─────────────────────────────────────────────────────────────────────── */
