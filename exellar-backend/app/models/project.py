@@ -11,7 +11,7 @@ class Project(db.Model):
     title = db.Column(db.String(255), nullable=False)
     slug = db.Column(db.String(255), unique=True, nullable=False)
     category = db.Column(db.String(100))
-    status = db.Column(db.Enum('ongoing', 'completed'), default='ongoing')
+    status = db.Column(db.Enum('ongoing', 'completed', name='project_status'), default='ongoing')
     location = db.Column(db.String(255))
     scope = db.Column(db.Text)
     size = db.Column(db.String(100))

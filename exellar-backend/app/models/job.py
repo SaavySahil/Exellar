@@ -10,7 +10,7 @@ class Job(db.Model):
     title = db.Column(db.String(255), nullable=False)
     department = db.Column(db.String(100))
     location = db.Column(db.String(255))
-    type = db.Column(db.Enum('full-time', 'part-time', 'contract'), default='full-time')
+    type = db.Column(db.Enum('full-time', 'part-time', 'contract', name='job_type'), default='full-time')
     description = db.Column(db.Text)
     requirements = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
