@@ -1,8 +1,26 @@
+import re
 from flask import Blueprint, request, jsonify
 from ..extensions import db
 from ..models.project import Project
 from ..utils.auth_middleware import token_required
 from ..utils.file_handler import save_image
+
+
+def _slugify(text):
+    text = text.lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_]+', '-', text)
+    text = re.sub(r'-+', '-', text).strip('-')
+    return text
+
+
+def _unique_slug(base):
+    slug = base
+    counter = 1
+    while Project.query.filter_by(slug=slug).first():
+        slug = f'{base}-{counter}'
+        counter += 1
+    return slug
 
 projects_bp = Blueprint('projects', __name__)
 
@@ -46,8 +64,10 @@ def admin_create_project(current_user):
     if not data or not data.get('title'):
         return jsonify({'error': 'Title is required'}), 400
 
+    slug = data.get('slug') or _unique_slug(_slugify(data['title']))
     project = Project(
         title=data['title'],
+        slug=slug,
         category=data.get('category'),
         status=data.get('status', 'ongoing'),
         location=data.get('location'),
