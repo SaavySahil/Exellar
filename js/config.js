@@ -1,83 +1,92 @@
 /**
- * config.js — Exellar API environment detection + animation fallback
- * Include this BEFORE closing </body> on every page.
+ * config.js — Exellar API environment detection + animation reveal fallback
+ * Placed before </body> on every page.
  */
 ;(function () {
   'use strict'
 
-  /* ── 1. API base URL ── */
-  var hostname = window.location.hostname
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    window.EXELLAR_API = 'http://localhost:5000'
-  } else {
-    window.EXELLAR_API = 'https://exellar-api.onrender.com'
+  /* ── 1. API base URL ─────────────────────────────────────────────────── */
+  var h = window.location.hostname
+  window.EXELLAR_API = (h === 'localhost' || h === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'https://exellar-api.onrender.com'
+
+  /* ── 2. Animation reveal fallback ────────────────────────────────────────
+     .anim-elem starts at opacity:0 — app.js adds .done to reveal them.
+     This fallback ensures every element becomes visible even if app.js
+     misses them (happens on inner pages due to scroll-trigger timing).
+  ─────────────────────────────────────────────────────────────────────── */
+
+  function addDone(el, delay) {
+    if (el.classList.contains('done')) return
+    if (delay) {
+      setTimeout(function () { el.classList.add('done') }, delay)
+    } else {
+      el.classList.add('done')
+    }
   }
 
-  /* ── 2. Animation reveal fallback ──────────────────────────────────────
-     The site uses .anim-elem { opacity:0 } revealed via JS (.done class).
-     If the main app.js scroll trigger misses elements (e.g. on inner pages),
-     this fallback guarantees every in-viewport element becomes visible.
-  ───────────────────────────────────────────────────────────────────────── */
+  /* Reveal all .anim-block children that are currently on-screen */
   function revealInView() {
-    var blocks = document.querySelectorAll('.anim-block')
     var vh = window.innerHeight
-    var scrollY = window.pageYOffset || document.documentElement.scrollTop
-
+    var blocks = document.querySelectorAll('.anim-block')
     for (var b = 0; b < blocks.length; b++) {
-      var rect = blocks[b].getBoundingClientRect()
-      // Reveal if block top is within 95 % of viewport
-      if (rect.top < vh * 0.95) {
-        var elems = blocks[b].querySelectorAll('.anim-elem')
-        for (var e = 0; e < elems.length; e++) {
-          if (!elems[e].classList.contains('done')) {
-            ;(function (el, delay) {
-              setTimeout(function () {
-                el.classList.add('done')
-              }, delay)
-            })(elems[e], e * 80)
-          }
+      var top = blocks[b].getBoundingClientRect().top
+      if (top < vh * 0.98) {                        // block is on screen
+        var kids = blocks[b].querySelectorAll('.anim-elem')
+        for (var k = 0; k < kids.length; k++) {
+          addDone(kids[k], k * 60)                   // stagger 60 ms
         }
       }
     }
   }
 
-  /* Also reveal orphan .anim-elem elements not inside any .anim-block */
+  /* Reveal orphan .anim-elem elements not inside any .anim-block */
   function revealOrphans() {
     var all = document.querySelectorAll('.anim-elem')
+    var vh  = window.innerHeight
     for (var i = 0; i < all.length; i++) {
-      if (!all[i].classList.contains('done')) {
-        var rect = all[i].getBoundingClientRect()
-        if (rect.top < window.innerHeight) {
-          all[i].classList.add('done')
-        }
-      }
+      if (all[i].getBoundingClientRect().top < vh) addDone(all[i], 0)
     }
   }
 
-  function onScroll() {
-    revealInView()
-    revealOrphans()
+  function revealAll() {
+    var all = document.querySelectorAll('.anim-elem')
+    for (var i = 0; i < all.length; i++) addDone(all[i], 0)
   }
 
-  /* Run after everything has loaded so layout is final */
-  window.addEventListener('load', function () {
-    // Give app.js's own animateOnScroll a 400 ms head-start
-    setTimeout(function () {
-      revealInView()
-      revealOrphans()
-    }, 400)
+  /* ── Fire order ──────────────────────────────────────────────────────── */
 
-    // Keep triggering on scroll (native + Lenis both fire scroll events)
-    window.addEventListener('scroll', onScroll, { passive: true })
-  })
+  /* Pass 1 – immediately when this script executes (DOM already exists
+     because we're at the bottom of <body>) */
+  revealInView()
+  revealOrphans()
 
-  /* Hard-deadline: after 1.8 s force ALL remaining hidden elems visible */
+  /* Pass 2 – 120 ms later: layout is stable, images starting to load */
+  setTimeout(function () {
+    revealInView()
+    revealOrphans()
+  }, 120)
+
+  /* Pass 3 – 600 ms deadline: catch anything the passes above missed */
+  setTimeout(function () {
+    revealInView()
+    revealOrphans()
+  }, 600)
+
+  /* Hard deadline – 1.5 s: force EVERYTHING visible regardless */
+  setTimeout(revealAll, 1500)
+
+  /* On every scroll: reveal newly in-view blocks */
+  window.addEventListener('scroll', function () {
+    revealInView()
+    revealOrphans()
+  }, { passive: true })
+
+  /* After images load: refresh positions and reveal again */
   window.addEventListener('load', function () {
-    setTimeout(function () {
-      var stale = document.querySelectorAll('.anim-elem:not(.done)')
-      for (var i = 0; i < stale.length; i++) {
-        stale[i].classList.add('done')
-      }
-    }, 1800)
+    revealInView()
+    revealOrphans()
+    setTimeout(revealAll, 500)      /* final safety net after load */
   })
 })()
