@@ -22,11 +22,10 @@ exellar-backend/instance/*.db
 *.zip
 Exellar.zip
 
-# Large media (videos & heavy images) - use CDN instead
-*.mp4
+# Large media - exclude only very large files (>50MB)
+# Small videos (<=10MB) are tracked directly
 *.mov
 *.avi
-media/
 images/us-maryland-hero-banner.jpg
 
 # Tool internals / AI memory
