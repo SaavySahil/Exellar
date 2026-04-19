@@ -10,8 +10,17 @@
 }
 
 .brand {
-  padding: 24px 20px 16px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border);
+}
+
+.brandLogo {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 4px;
 }
 
 .brandText {

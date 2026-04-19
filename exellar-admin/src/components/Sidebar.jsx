@@ -22,7 +22,11 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
-        <span className={styles.brandText}>Exellar</span>
+        <img
+          src="/exellar-logo.webp"
+          alt="Exellar Construction LLP"
+          className={styles.brandLogo}
+        />
         <span className={styles.brandSub}>Admin Panel</span>
       </div>
 
