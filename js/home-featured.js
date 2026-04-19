@@ -1,83 +1,65 @@
 /**
  * home-featured.js
- * Fetches featured projects from the API and injects them into the
- * #featured-projects-grid container on Home.html.
- * Triggers Blazy re-init and ScrollTrigger.refresh() after injection.
+ * Loads the 3 most-recent projects from the API and updates the
+ * "Our Projects" featured grid on the homepage.
+ * Also updates the mega-menu "Featured Project" slider.
  */
 ;(function () {
   'use strict'
 
-  const API_BASE = window.EXELLAR_API || 'http://localhost:5000'
-  const GRID_ID  = 'featured-projects-grid'
-  const MAX      = 3
+  var API_BASE = window.EXELLAR_API || 'http://localhost:5000'
 
-  function cardHTML(project, index) {
-    const isLast    = index === MAX - 1
-    const padding   = isLast ? '' : 'padding-right:20px; box-sizing:border-box;'
-    const imgSrc    = project.thumbnail
-      ? `${API_BASE}/api/uploads/images/${project.thumbnail}`
+  function imgSrc(p) {
+    return p.thumbnail
+      ? API_BASE + '/api/uploads/images/' + p.thumbnail
       : 'images/project-placeholder.jpg'
-    const status    = project.status === 'completed' ? 'Completed' : 'Ongoing'
-    const category  = project.category || 'Construction'
-    const slug      = project.slug || project.id
-
-    return `
-      <div class="inline_block col-d-33 col-t-50 col-m-100 v-top anim-elem top" style="${padding}">
-        <a href="Projects.html?slug=${slug}" class="to-be-scaled radius">
-          <img class="radius w-100 b-lazy" data-src="${imgSrc}" src="" alt="${project.title}">
-        </a>
-        <h3 class="title fs-40">${project.title}</h3>
-        <p class="para fs-19">${category}&nbsp;·&nbsp;${status}</p>
-        <a href="Projects.html?slug=${slug}" class="btn-link">
-          View Project
-          <img aria-hidden="true" src="images/btn-arrow.svg" alt="arrow" width="35" height="14">
-        </a>
-      </div>
-    `
   }
 
-  function inject(projects) {
-    const grid = document.getElementById(GRID_ID)
-    if (!grid) return
-
-    const featured = projects.filter(p => p.is_featured).slice(0, MAX)
-    const toShow   = featured.length ? featured : projects.slice(0, MAX)
-
-    if (!toShow.length) {
-      grid.closest('section').style.display = 'none'
-      return
-    }
-
-    grid.innerHTML = toShow.map((p, i) => cardHTML(p, i)).join('')
-
-    // Re-init Blazy for lazy images
-    if (window.bLazy && typeof window.bLazy.revalidate === 'function') {
-      window.bLazy.revalidate()
-    }
-
-    // Refresh GSAP ScrollTrigger so new elements animate correctly
-    if (window.ScrollTrigger) {
-      window.ScrollTrigger.refresh()
-    }
-
-    // Fire custom event so other scripts can react
-    document.dispatchEvent(new CustomEvent('dynamicContentLoaded'))
+  function card(p) {
+    var cat    = p.category || 'Construction'
+    var status = p.status === 'completed' ? 'Completed' : 'Ongoing'
+    var loc    = p.location ? p.location + ' \u00b7\u00a0' : ''
+    var slug   = p.slug || p.id
+    return '<div class="inline_block col-d-33 col-t-50 col-m-100 anim-elem top">'
+      + '<span class="para fs-20 black90">' + cat + '</span>'
+      + '<a href="Project Page.html?slug=' + slug + '" class="proj-list-img to-be-scaled radius">'
+      + '<img class="w-100 radius" src="' + imgSrc(p) + '" alt="' + p.title + '">'
+      + '</a>'
+      + '<a href="Project Page.html?slug=' + slug + '" class="proj-list-txt">'
+      + '<h3 class="proj-list-city">' + loc + status + '</h3>'
+      + '<h2 class="title fs-30">' + p.title + '</h2>'
+      + '</a>'
+      + '</div>'
   }
 
   function init() {
-    fetch(`${API_BASE}/api/projects?is_featured=true`)
-      .then(function (res) { return res.ok ? res.json() : [] })
+    fetch(API_BASE + '/api/projects')
+      .then(function (r) { return r.ok ? r.json() : [] })
       .then(function (data) {
-        if (!data.length) {
-          // Fallback: fetch all and take first 3
-          return fetch(`${API_BASE}/api/projects`).then(r => r.ok ? r.json() : [])
+        if (!Array.isArray(data) || !data.length) return
+
+        // Update featured grid
+        var grid = document.getElementById('home-featured-grid')
+        if (grid) grid.innerHTML = data.slice(0, 3).map(card).join('')
+
+        // Update megamenu slider
+        var sw = document.querySelector('.megamenu-slider .swiper-wrapper')
+        if (sw) {
+          sw.innerHTML = data.slice(0, 3).map(function (p) {
+            return '<div class="swiper-slide">'
+              + '<a href="Project Page.html?slug=' + (p.slug || p.id) + '" class="to-be-scaled radius">'
+              + '<img class="radius w-100" src="' + imgSrc(p) + '" alt="' + p.title + '">'
+              + '</a>'
+              + '<h3 class="title fs-40">' + p.title + '</h3>'
+              + '</div>'
+          }).join('')
         }
-        return data
+
+        // Trigger animation reveal on freshly injected cards
+        if (document.dispatchEvent)
+          document.dispatchEvent(new CustomEvent('dynamicContentLoaded'))
       })
-      .then(inject)
-      .catch(function () {
-        // On error, keep the static placeholder cards already in HTML
-      })
+      .catch(function () { /* keep hardcoded fallback */ })
   }
 
   if (document.readyState === 'loading') {
