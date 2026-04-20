@@ -30,13 +30,19 @@ export default function ProjectForm() {
 
   useEffect(() => {
     if (existing) {
-      const { gallery: g, ...rest } = existing
-      setForm({ ...INITIAL, ...rest })
-      setGallery(g || [])
+      const sanitized = { ...INITIAL }
+      Object.keys(INITIAL).forEach(key => {
+        sanitized[key] = existing[key] ?? INITIAL[key]
+      })
+      setForm(sanitized)
+      setGallery(existing.gallery || [])
     }
   }, [existing])
 
-  function set(key, val) { setForm(prev => ({ ...prev, [key]: val })) }
+  function set(key, val) { 
+    const safeVal = val ?? ''
+    setForm(prev => ({ ...prev, [key]: safeVal })) 
+  }
 
   async function uploadImage(file) {
     const fd = new FormData()

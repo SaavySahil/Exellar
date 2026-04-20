@@ -33,10 +33,19 @@ export default function ArticleForm() {
   })
 
   useEffect(() => {
-    if (existing) setForm({ ...INITIAL, ...existing })
+    if (existing) {
+      const sanitized = { ...INITIAL }
+      Object.keys(INITIAL).forEach(key => {
+        sanitized[key] = existing[key] ?? INITIAL[key]
+      })
+      setForm(sanitized)
+    }
   }, [existing])
 
-  function set(key, val) { setForm(prev => ({ ...prev, [key]: val })) }
+  function set(key, val) { 
+    const safeVal = val ?? ''
+    setForm(prev => ({ ...prev, [key]: safeVal })) 
+  }
 
   async function handleThumbnailChange(e) {
     const file = e.target.files[0]
