@@ -38,7 +38,7 @@ export default function Articles() {
       ) : (
         <div className={styles.table}>
           <div className={`${styles.row} ${styles.thead}`}>
-            <span>Title</span><span>Category</span><span>Author</span><span>Status</span><span>Published</span><span>Actions</span>
+            <span className={styles.title}>Title</span><span>Category</span><span>Author</span><span>Status</span><span>Published</span><span className={styles.actions}>Actions</span>
           </div>
           {articles.map(a => (
             <div key={a.id} className={styles.row}>

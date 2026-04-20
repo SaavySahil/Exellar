@@ -38,7 +38,7 @@ export default function Jobs() {
       ) : (
         <div className={styles.table}>
           <div className={`${styles.row} ${styles.thead}`}>
-            <span>Title</span><span>Department</span><span>Type</span><span>Status</span><span>Actions</span>
+            <span className={styles.title}>Title</span><span>Department</span><span>Type</span><span>Status</span><span className={styles.actions}>Actions</span>
           </div>
           {jobs.map(j => (
             <div key={j.id} className={styles.row}>

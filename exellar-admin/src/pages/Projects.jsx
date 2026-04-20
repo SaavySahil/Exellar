@@ -44,7 +44,7 @@ export default function Projects() {
       ) : (
         <div className={styles.table}>
           <div className={`${styles.row} ${styles.thead}`}>
-            <span>Title</span><span>Category</span><span>Status</span><span>Featured</span><span>Actions</span>
+            <span className={styles.title}>Title</span><span>Category</span><span>Status</span><span>Featured</span><span className={styles.actions}>Actions</span>
           </div>
           {projects.map(p => (
             <div key={p.id} className={styles.row}>
