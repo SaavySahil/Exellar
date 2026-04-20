@@ -50,8 +50,8 @@
   font-size: 16px;
 }
 
-/* Desktop & Large Tablet */
-@media (min-width: 1025px) {
+/* Desktop & Tablet */
+@media (min-width: 769px) {
   .sidebarWrapper {
     position: sticky;
     top: 0;
@@ -63,8 +63,8 @@
   }
 }
 
-/* Mobile & Small Tablet */
-@media (max-width: 1024px) {
+/* Mobile */
+@media (max-width: 768px) {
   .shell {
     flex-direction: column;
   }

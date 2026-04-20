@@ -76,7 +76,7 @@
   gap: 8px; 
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .thead {
     display: none;
   }
@@ -127,7 +127,7 @@
   transition: background 0.15s;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .edit, .del {
     flex: 1;
     padding: 10px;
