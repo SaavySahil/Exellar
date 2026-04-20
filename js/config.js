@@ -1,6 +1,5 @@
 /**
- * config.js — Exellar API URL + nuclear visibility fix
- * Placed before </body> on every page.
+ * config.js — Exellar API URL + animation reveal fix
  */
 ;(function () {
   'use strict'
@@ -11,31 +10,43 @@
     ? 'http://localhost:5000'
     : 'https://exellar-api.onrender.com'
 
-  /* ── 2. NUCLEAR VISIBILITY FIX ──────────────────────────────────────────
-     The site CSS sets .anim-elem { opacity:0 } and JS is supposed to add
-     .done to reveal them via scroll. That JS fails on every page except
-     the homepage. Fix: force inline opacity:1 on every .anim-elem element
-     right now, bypassing the entire animation system.
-     Inline styles beat stylesheet rules (even !important), so this wins.
+  /* ── 2. ANIMATION REVEAL FIX ─────────────────────────────────────────────
+     animateOnScroll runs before browser paints (window.height = 0), so the
+     viewport check fires on 0 elements. Fix: re-run reveal after paint using
+     rAF, plus add .done class directly and set inline styles as backup.
   ─────────────────────────────────────────────────────────────────────── */
-  function nukeHidden() {
+  function revealAll() {
     var elems = document.querySelectorAll('.anim-elem')
     for (var i = 0; i < elems.length; i++) {
+      elems[i].classList.add('done')
       elems[i].style.opacity    = '1'
       elems[i].style.transform  = 'none'
       elems[i].style.visibility = 'visible'
     }
   }
 
-  /* Run RIGHT NOW — config.js is at bottom of <body> so DOM is parsed */
-  nukeHidden()
+  /* Run immediately for any already-parsed elements */
+  revealAll()
 
-  /* Run again after 100 ms in case any elements were added by other scripts */
-  setTimeout(nukeHidden, 100)
+  /* Run after first paint — window.height is valid here */
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      revealAll()
+      /* Re-trigger animateOnScroll if jQuery is available */
+      if (window.jQuery) {
+        var $ = window.jQuery
+        $('body .anim-block').each(function () {
+          $(this).find('.anim-elem').addClass('done')
+        })
+      }
+    })
+  })
 
-  /* Run again after full page load (images etc.) */
-  window.addEventListener('load', nukeHidden)
+  /* Final safety net on full load */
+  window.addEventListener('load', function () {
+    revealAll()
+    /* Also trigger a fake scroll to kick animateOnScroll's scroll handler */
+    window.dispatchEvent(new Event('scroll'))
+  })
 
-  /* Scroll: reveal any elements dynamically injected after load */
-  window.addEventListener('scroll', nukeHidden, { passive: true })
 })()
