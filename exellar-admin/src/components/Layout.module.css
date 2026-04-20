@@ -5,22 +5,8 @@
 }
 
 .sidebarWrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  z-index: 1000;
   display: flex;
-  visibility: hidden;
-  pointer-events: none;
-  transition: visibility 0s 0.3s;
-}
-
-.sidebarWrapper.open {
-  visibility: visible;
-  pointer-events: auto;
-  transition: visibility 0s 0s;
+  z-index: 1000;
 }
 
 .main {
@@ -64,25 +50,40 @@
   font-size: 16px;
 }
 
-/* Desktop */
-@media (min-width: 769px) {
+/* Desktop & Large Tablet */
+@media (min-width: 1025px) {
   .sidebarWrapper {
     position: sticky;
-    transform: none !important;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-w);
   }
   .overlay {
     display: none;
   }
 }
 
-/* Mobile */
-@media (max-width: 768px) {
+/* Mobile & Small Tablet */
+@media (max-width: 1024px) {
   .shell {
     flex-direction: column;
   }
 
   .sidebarWrapper {
-    /* Hide the entire wrapper by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 0s 0.3s;
+  }
+
+  .sidebarWrapper.open {
+    visibility: visible;
+    pointer-events: auto;
+    transition: visibility 0s 0s;
   }
 
   /* Target the Sidebar component inside the wrapper */

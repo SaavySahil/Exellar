@@ -38,7 +38,7 @@
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .closeBtn { display: block; }
   .sidebar { width: 280px; }
 }
