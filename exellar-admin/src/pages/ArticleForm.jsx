@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import client from '../api/client.js'
+import client, { API_BASE } from '../api/client.js'
 import Toast from '../components/Toast.jsx'
 import styles from './Form.module.css'
 
@@ -90,7 +90,8 @@ export default function ArticleForm() {
         {uploading && <p className={styles.hint}>Uploading…</p>}
         {form.thumbnail && (
           <img
-            src={`${import.meta.env.VITE_API_BASE || 'http://localhost:5000'}/api/uploads/images/${form.thumbnail}`}
+            src={`${API_BASE}/api/uploads/images/${form.thumbnail}`}
+
             alt="thumbnail preview"
             style={{ maxWidth: 220, marginTop: 8, borderRadius: 6 }}
           />

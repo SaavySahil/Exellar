@@ -3,14 +3,14 @@ import { useAuth } from '../context/AuthContext.jsx'
 import styles from './Sidebar.module.css'
 
 const NAV = [
-  { to: '/dashboard',    label: 'Dashboard',     icon: '▦' },
-  { to: '/projects',     label: 'Projects',       icon: '🏗' },
-  { to: '/jobs',         label: 'Jobs',           icon: '💼' },
-  { to: '/applications', label: 'Applications',   icon: '📋' },
-  { to: '/articles',     label: 'Blog Articles',  icon: '📝' },
+  { to: '/dashboard',    label: 'Dashboard',     icon: '□' },
+  { to: '/projects',     label: 'Projects',       icon: '○' },
+  { to: '/jobs',         label: 'Jobs',           icon: '◇' },
+  { to: '/applications', label: 'Applications',   icon: '▤' },
+  { to: '/articles',     label: 'Blog Articles',  icon: '✎' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -19,15 +19,23 @@ export default function Sidebar() {
     navigate('/login')
   }
 
+  function handleNavClick() {
+    if (onClose) onClose()
+  }
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
-        <img
-          src="/exellar-logo.webp"
-          alt="Exellar Construction LLP"
-          className={styles.brandLogo}
-        />
-        <span className={styles.brandSub}>Admin Panel</span>
+        <div className={styles.brandTop}>
+          <img
+            src="/exellar-logo.png"
+            alt="Exellar Construction LLP"
+            className={styles.brandLogo}
+          />
+          {onClose && (
+            <button className={styles.closeBtn} onClick={onClose}>×</button>
+          )}
+        </div>
       </div>
 
       <nav className={styles.nav}>
@@ -35,6 +43,7 @@ export default function Sidebar() {
           <NavLink
             key={to}
             to={to}
+            onClick={handleNavClick}
             className={({ isActive }) =>
               `${styles.link} ${isActive ? styles.active : ''}`
             }

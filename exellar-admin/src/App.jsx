@@ -8,7 +8,6 @@ import ProjectForm from './pages/ProjectForm.jsx'
 import Jobs from './pages/Jobs.jsx'
 import JobForm from './pages/JobForm.jsx'
 import Applications from './pages/Applications.jsx'
-import Content from './pages/Content.jsx'
 import Articles from './pages/Articles.jsx'
 import ArticleForm from './pages/ArticleForm.jsx'
 
@@ -40,7 +39,6 @@ export default function App() {
             <Route path="jobs/new" element={<JobForm />} />
             <Route path="jobs/:id/edit" element={<JobForm />} />
             <Route path="applications" element={<Applications />} />
-            <Route path="content" element={<Content />} />
             <Route path="articles" element={<Articles />} />
             <Route path="articles/new" element={<ArticleForm />} />
             <Route path="articles/:id/edit" element={<ArticleForm />} />

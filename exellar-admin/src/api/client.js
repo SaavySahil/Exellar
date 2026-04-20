@@ -1,6 +1,12 @@
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000'
+const h = window.location.hostname
+const fallbackAPI = (h === 'localhost' || h === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'https://exellar-api.onrender.com'
+
+export const API_BASE = import.meta.env.VITE_API_BASE || fallbackAPI
+
 
 const client = axios.create({
   baseURL: API_BASE,

@@ -12,7 +12,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e) {
-    e.preventDefault()
+    if (e) e.preventDefault()
     setError('')
     setLoading(true)
     try {
@@ -25,11 +25,16 @@ export default function Login() {
     }
   }
 
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') handleSubmit()
+  }
+
   return (
     <div className={styles.page}>
-      <form className={styles.card} onSubmit={handleSubmit}>
-        <h1 className={styles.title}>Exellar Admin</h1>
-        <p className={styles.sub}>Sign in to continue</p>
+      <div className={styles.card}>
+        <div className={styles.logoWrapper}>
+          <img src="/exellar-logo.png" alt="Exellar" className={styles.logo} />
+        </div>
 
         {error && <div className={styles.error}>{error}</div>}
 
@@ -39,6 +44,7 @@ export default function Login() {
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="admin@exellar.co.in"
           required
           autoFocus
@@ -50,14 +56,15 @@ export default function Login() {
           type="password"
           value={password}
           onChange={e => setPassword(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="••••••••"
           required
         />
 
-        <button className={styles.btn} type="submit" disabled={loading}>
+        <button className={styles.btn} onClick={handleSubmit} disabled={loading}>
           {loading ? 'Signing in…' : 'Sign In'}
         </button>
-      </form>
+      </div>
     </div>
   )
 }

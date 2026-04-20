@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import client from '../api/client.js'
+import client, { API_BASE } from '../api/client.js'
 import Toast from '../components/Toast.jsx'
 import styles from './Form.module.css'
 
@@ -86,12 +86,12 @@ export default function ProjectForm() {
     saveMutation.mutate()
   }
 
-  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000'
+
 
   return (
     <div>
       <h1 className={styles.heading}>{isEdit ? 'Edit Project' : 'New Project'}</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.form}>
 
         <div className={styles.row2}>
           <div className={styles.field}>
@@ -197,12 +197,13 @@ export default function ProjectForm() {
         <div className={styles.formActions}>
           <button type="button" className={styles.cancel}
             onClick={() => navigate('/projects')}>Cancel</button>
-          <button type="submit" className={styles.save}
+          <button type="button" className={styles.save}
+            onClick={handleSubmit}
             disabled={saveMutation.isPending || uploading}>
             {saveMutation.isPending ? 'Saving…' : 'Save Project'}
           </button>
         </div>
-      </form>
+      </div>
 
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import client from '../api/client.js'
+import client, { API_BASE } from '../api/client.js'
 import ConfirmModal from '../components/ConfirmModal.jsx'
 import Toast from '../components/Toast.jsx'
 import styles from './Applications.module.css'
@@ -28,7 +28,7 @@ export default function Applications() {
 
   function downloadResume(app) {
     const token = localStorage.getItem('exellar_token')
-    const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000'
+
     window.open(`${API_BASE}/api/admin/applications/${app.id}/resume?token=${token}`, '_blank')
   }
 

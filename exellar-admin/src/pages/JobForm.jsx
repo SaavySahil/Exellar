@@ -44,7 +44,7 @@ export default function JobForm() {
   return (
     <div>
       <h1 className={styles.heading}>{isEdit ? 'Edit Job' : 'New Job'}</h1>
-      <form onSubmit={e => { e.preventDefault(); saveMutation.mutate() }} className={styles.form}>
+      <div className={styles.form}>
 
         <div className={styles.row2}>
           <div className={styles.field}>
@@ -99,11 +99,13 @@ export default function JobForm() {
         <div className={styles.formActions}>
           <button type="button" className={styles.cancel}
             onClick={() => navigate('/jobs')}>Cancel</button>
-          <button type="submit" className={styles.save} disabled={saveMutation.isPending}>
+          <button type="button" className={styles.save}
+            onClick={() => saveMutation.mutate()}
+            disabled={saveMutation.isPending}>
             {saveMutation.isPending ? 'Saving…' : 'Save Job'}
           </button>
         </div>
-      </form>
+      </div>
 
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
