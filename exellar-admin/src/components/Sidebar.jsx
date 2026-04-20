@@ -3,11 +3,11 @@ import { useAuth } from '../context/AuthContext.jsx'
 import styles from './Sidebar.module.css'
 
 const NAV = [
-  { to: '/dashboard',    label: 'Dashboard',     icon: '□' },
-  { to: '/projects',     label: 'Projects',       icon: '○' },
-  { to: '/jobs',         label: 'Jobs',           icon: '◇' },
-  { to: '/applications', label: 'Applications',   icon: '▤' },
-  { to: '/articles',     label: 'Blog Articles',  icon: '✎' },
+  { to: '/dashboard',    label: 'Dashboard' },
+  { to: '/projects',     label: 'Projects' },
+  { to: '/jobs',         label: 'Jobs' },
+  { to: '/applications', label: 'Applications' },
+  { to: '/articles',     label: 'Blog Articles' },
 ]
 
 export default function Sidebar({ onClose }) {
@@ -39,7 +39,7 @@ export default function Sidebar({ onClose }) {
       </div>
 
       <nav className={styles.nav}>
-        {NAV.map(({ to, label, icon }) => (
+        {NAV.map(({ to, label }) => (
           <NavLink
             key={to}
             to={to}
@@ -48,11 +48,11 @@ export default function Sidebar({ onClose }) {
               `${styles.link} ${isActive ? styles.active : ''}`
             }
           >
-            <span className={styles.icon}>{icon}</span>
             {label}
           </NavLink>
         ))}
       </nav>
+
 
       <div className={styles.footer}>
         <p className={styles.userEmail}>{user?.email}</p>
