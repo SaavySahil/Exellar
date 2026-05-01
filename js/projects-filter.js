@@ -112,6 +112,13 @@
     renderPage(1);
   }
 
+  // Re-run pagination after dynamic cards are injected by projects-dynamic.js
+  document.addEventListener('dynamicContentLoaded', function () {
+    currentPage = 1;
+    activeStatus = null;
+    renderPage(1);
+  });
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
