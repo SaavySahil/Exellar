@@ -45,7 +45,9 @@
       ? allProjects
       : allProjects.filter(p => p.status === filter)
 
-    grid.innerHTML = visible.map(cardHTML).join('')
+    grid.innerHTML = visible.length
+      ? visible.map(cardHTML).join('')
+      : '<p class="para fs-19" style="opacity:0.5;padding:40px 0;">No projects found.</p>'
 
     const countEl = document.getElementById(COUNT_ID)
     if (countEl) countEl.textContent = visible.length

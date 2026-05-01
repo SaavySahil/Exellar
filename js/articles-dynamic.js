@@ -49,7 +49,10 @@
         if (window.ScrollTrigger) window.ScrollTrigger.refresh()
         document.dispatchEvent(new CustomEvent('dynamicContentLoaded'))
       })
-      .catch(function () { /* keep hardcoded fallback */ })
+      .catch(function () {
+        var g = document.getElementById('articles-grid')
+        if (g) g.innerHTML = '<p class="para fs-19" style="opacity:0.5;padding:40px 0;">Unable to load articles.</p>'
+      })
   }
 
   if (document.readyState === 'loading') {
