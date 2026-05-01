@@ -121,9 +121,23 @@
         .client-logos-strip::before { top: 0; }
         .client-logos-strip::after { bottom: 0; }
 
-        /* View All Projects CTA — add space between last card title and the box */
+        /* View All Projects CTA — bordered box spanning between the two vertical grid lines */
         #view-all-projects-cta {
             margin-top: 40px;
+            margin-left: 25vw;
+            width: 50vw;
+            border-top: 1px solid #DBDBDB;
+            border-bottom: 1px solid #DBDBDB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 0;
+            box-sizing: border-box;
+        }
+        #view-all-projects-cta .btn-link {
+            border: none !important;
+            padding: 0;
+            margin: 0;
         }
     </style>
     </head>
