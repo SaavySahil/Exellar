@@ -33,12 +33,12 @@
   }
 
   function init() {
-    fetch(API_BASE + '/api/projects')
+    fetch(API_BASE + '/api/projects?is_featured=true')
       .then(function (r) { return r.ok ? r.json() : [] })
       .then(function (data) {
         if (!Array.isArray(data) || !data.length) return
 
-        // Update featured grid
+        // Update featured grid (max 3)
         var grid = document.getElementById('home-featured-grid')
         if (grid) grid.innerHTML = data.slice(0, 3).map(card).join('')
 
