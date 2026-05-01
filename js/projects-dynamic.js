@@ -20,25 +20,20 @@
       : 'images/project-placeholder.jpg'
     const status   = project.status === 'completed' ? 'Completed' : 'Ongoing'
     const category = project.category || 'Construction'
-    const slug     = project.slug || project.id
+    const slug     = encodeURIComponent(project.slug || project.id)
+    const location = project.location || ''
+    const cityLine = location ? `${location}&nbsp;&nbsp;·&nbsp;&nbsp;${status}` : status
 
-    return `
-      <div class="inline_block col-d-33 col-t-50 col-m-100 v-top anim-elem top"
-           style="padding-right:20px; box-sizing:border-box; margin-bottom:40px;"
-           data-status="${project.status}">
-        <a href="Project Page.html?slug=${slug}" class="to-be-scaled radius">
-          <img class="radius w-100 b-lazy" data-src="${imgSrc}" src="" alt="${project.title}">
-        </a>
-        <h3 class="title fs-40">${project.title}</h3>
-        <p class="para fs-19">${category}&nbsp;·&nbsp;${status}
-          ${project.location ? `&nbsp;·&nbsp;${project.location}` : ''}
-        </p>
-        <a href="Project Page.html?slug=${slug}" class="btn-link">
-          View Project
-          <img aria-hidden="true" src="images/btn-arrow.svg" alt="arrow" width="35" height="14">
-        </a>
-      </div>
-    `
+    return `<div class="inline_block col-d-25 col-t-50 col-m-100 anim-elem top" data-status="${project.status}">
+      <span class="para fs-20 black90">${category}</span>
+      <a href="Project Page.html?slug=${slug}" class="proj-list-img to-be-scaled radius">
+        <img class="w-100 radius b-lazy" data-src="${imgSrc}" src="images/project-placeholder.jpg" alt="${project.title}">
+      </a>
+      <a href="Project Page.html?slug=${slug}" class="proj-list-txt">
+        <h3 class="proj-list-city">${cityLine}</h3>
+        <h2 class="title fs-30">${project.title}</h2>
+      </a>
+    </div>`
   }
 
   function render(filter) {
