@@ -161,3 +161,36 @@
 }
 
 .del:hover { background: var(--accent-dim); }
+
+.muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search {
+  flex: 1;
+  max-width: 320px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search:focus { border-color: var(--primary); }
+
+.searchCount {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}

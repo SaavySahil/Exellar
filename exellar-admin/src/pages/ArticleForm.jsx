@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client, { API_BASE } from '../api/client.js'
-import Toast from '../components/Toast.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 import styles from './Form.module.css'
 
 const INITIAL = {
@@ -22,9 +22,18 @@ export default function ArticleForm() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const isEdit = Boolean(id)
+  const addToast = useToast()
   const [form, setForm] = useState(INITIAL)
+  const [errors, setErrors] = useState({})
   const [uploading, setUploading] = useState(false)
-  const [toast, setToast] = useState(null)
+
+  function validate() {
+    const e = {}
+    if (!form.title.trim()) e.title = 'Title is required'
+    if (!form.body.trim()) e.body = 'Body content is required'
+    setErrors(e)
+    return Object.keys(e).length === 0
+  }
 
   const { data: existing } = useQuery({
     queryKey: ['admin-article', id],
@@ -56,7 +65,7 @@ export default function ArticleForm() {
       fd.append('image', file)
       const res = await client.post('/api/admin/upload', fd)
       set('thumbnail', res.data.filename)
-    } catch { setToast({ message: 'Upload failed', type: 'error' }) }
+    } catch { addToast('Upload failed', 'error') }
     finally { setUploading(false) }
   }
 
@@ -68,7 +77,7 @@ export default function ArticleForm() {
       qc.invalidateQueries(['admin-articles'])
       navigate('/articles')
     },
-    onError: () => setToast({ message: 'Save failed', type: 'error' }),
+    onError: () => addToast('Save failed', 'error'),
   })
 
   return (
@@ -77,7 +86,10 @@ export default function ArticleForm() {
 
       <div className={styles.form}>
         <label className={styles.label}>Title *</label>
-        <input className={styles.input} value={form.title} onChange={e => set('title', e.target.value)} placeholder="Article title" />
+        <input className={`${styles.input} ${errors.title ? styles.inputError : ''}`} value={form.title}
+          onChange={e => { set('title', e.target.value); setErrors(p => ({ ...p, title: '' })) }}
+          placeholder="Article title" />
+        {errors.title && <span className={styles.fieldError}>{errors.title}</span>}
 
         <label className={styles.label}>Category</label>
         <select className={styles.input} value={form.category} onChange={e => set('category', e.target.value)}>
@@ -91,8 +103,11 @@ export default function ArticleForm() {
         <label className={styles.label}>Summary</label>
         <textarea className={styles.textarea} rows={3} value={form.summary} onChange={e => set('summary', e.target.value)} placeholder="Short description shown on the articles listing page" />
 
-        <label className={styles.label}>Body (HTML or plain text)</label>
-        <textarea className={styles.textarea} rows={14} value={form.body} onChange={e => set('body', e.target.value)} placeholder="Full article content..." />
+        <label className={styles.label}>Body (HTML or plain text) *</label>
+        <textarea className={`${styles.textarea} ${errors.body ? styles.inputError : ''}`} rows={14} value={form.body}
+          onChange={e => { set('body', e.target.value); setErrors(p => ({ ...p, body: '' })) }}
+          placeholder="Full article content..." />
+        {errors.body && <span className={styles.fieldError}>{errors.body}</span>}
 
         <label className={styles.label}>Thumbnail</label>
         <input type="file" accept="image/*" onChange={handleThumbnailChange} className={styles.input} />
@@ -112,14 +127,13 @@ export default function ArticleForm() {
         </label>
 
         <div className={styles.btnRow}>
-          <button className={styles.save} onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending || !form.title}>
+          <button className={styles.save} onClick={() => validate() && saveMutation.mutate()} disabled={saveMutation.isPending}>
             {saveMutation.isPending ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Article'}
           </button>
           <button className={styles.cancel} onClick={() => navigate('/articles')}>Cancel</button>
         </div>
       </div>
 
-      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client, { API_BASE } from '../api/client.js'
-import Toast from '../components/Toast.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 import styles from './Form.module.css'
 
 const INITIAL = {
@@ -18,9 +18,9 @@ export default function ProjectForm() {
   const qc = useQueryClient()
   const isEdit = Boolean(id)
   const [form, setForm] = useState(INITIAL)
+  const addToast = useToast()
   const [gallery, setGallery] = useState([])
   const [uploading, setUploading] = useState(false)
-  const [toast, setToast] = useState(null)
 
   const { data: existing } = useQuery({
     queryKey: ['project', id],
@@ -58,7 +58,7 @@ export default function ProjectForm() {
     try {
       const filename = await uploadImage(file)
       set('thumbnail', filename)
-    } catch { setToast({ message: 'Upload failed', type: 'error' }) }
+    } catch { addToast('Upload failed', 'error') }
     finally { setUploading(false) }
   }
 
@@ -69,7 +69,7 @@ export default function ProjectForm() {
     try {
       const filename = await uploadImage(file)
       setGallery(prev => [...prev, filename])
-    } catch { setToast({ message: 'Upload failed', type: 'error' }) }
+    } catch { addToast('Upload failed', 'error') }
     finally { setUploading(false) }
   }
 
@@ -84,7 +84,7 @@ export default function ProjectForm() {
       qc.invalidateQueries(['admin-projects'])
       navigate('/projects')
     },
-    onError: err => setToast({ message: err.response?.data?.error || 'Save failed', type: 'error' }),
+    onError: err => addToast(err.response?.data?.error || 'Save failed', 'error'),
   })
 
   function handleSubmit(e) {
@@ -210,8 +210,6 @@ export default function ProjectForm() {
           </button>
         </div>
       </div>
-
-      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
   )
 }

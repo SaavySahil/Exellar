@@ -8,6 +8,8 @@ const MAP = {
   contract:  { label: 'Contract',  cls: styles.contract },
   active:    { label: 'Active',    cls: styles.active },
   inactive:  { label: 'Inactive',  cls: styles.inactive },
+  published: { label: 'Published', cls: styles.active },
+  draft:     { label: 'Draft',     cls: styles.inactive },
 }
 
 export default function StatusBadge({ value }) {
