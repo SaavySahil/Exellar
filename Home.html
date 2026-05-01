@@ -200,6 +200,21 @@
             padding: 0;
             margin: 0;
         }
+
+        /* Standardize spacing after all major sections */
+        section.home-office, 
+        .pinned-with-title, 
+        section.home-commitments {
+            padding-bottom: 8vw !important;
+        }
+
+        @media (max-width: 1024px) {
+            section.home-office, 
+            .pinned-with-title, 
+            section.home-commitments {
+                padding-bottom: 80px !important;
+            }
+        }
     </style>
 </head>
 
