@@ -58,17 +58,13 @@
 
     <style>
         /* Client logos strip */
-        .client-logos-strip {
-            display: flex;
+        .client-logos-strip { position: relative; display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 32px;
             margin-top: 40px;
-            padding: 40px 0;
-            border-top: 1px solid rgba(0,0,0,0.08);
-            border-bottom: 1px solid rgba(0,0,0,0.08);
-        }
+            padding: 40px 0; }
         .client-logo-item {
             flex: 1 1 120px;
             display: flex;
@@ -90,10 +86,8 @@
             opacity: 1;
         }
         @media (max-width: 767px) {
-            .client-logos-strip {
-                gap: 24px;
-                justify-content: center;
-            }
+            .client-logos-strip { position: relative; gap: 24px;
+                justify-content: center; }
             .client-logo-item {
                 flex: 0 1 calc(33% - 24px);
             }
@@ -122,6 +116,11 @@
                 width: 100%;
             }
         }
+    
+        .client-logos-strip::before, .client-logos-strip::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 100vw; height: 1px; background: rgba(0,0,0,0.08); z-index: 1; }
+        .client-logos-strip::before { top: 0; }
+        .client-logos-strip::after { bottom: 0; }
+    
     </style>
     </head>
     <body>
