@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import client from '../api/client.js'
 import styles from './Login.module.css'
 
 export default function Login() {
@@ -10,6 +11,24 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [slowHint, setSlowHint] = useState(false)
+  const slowTimer = useRef(null)
+  const hintTimer = useRef(null)
+
+  // Pre-warm the Render backend as soon as the login page mounts
+  useEffect(() => {
+    client.get('/api/health').catch(() => {})
+  }, [])
+
+  function startSlowHint() {
+    slowTimer.current = setTimeout(() => setSlowHint(true), 5000)
+  }
+
+  function stopSlowHint() {
+    clearTimeout(slowTimer.current)
+    clearTimeout(hintTimer.current)
+    setSlowHint(false)
+  }
 
   async function handleSubmit(e) {
     if (e) e.preventDefault()
@@ -18,13 +37,15 @@ export default function Login() {
     if (!/\S+@\S+\.\S+/.test(email)) { setError('Enter a valid email address'); return }
     if (!password) { setError('Password is required'); return }
     setLoading(true)
+    startSlowHint()
     try {
       await login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed')
+      setError(err.response?.data?.error || 'Login failed. Please try again.')
     } finally {
       setLoading(false)
+      stopSlowHint()
     }
   }
 
@@ -67,6 +88,12 @@ export default function Login() {
         <button className={styles.btn} onClick={handleSubmit} disabled={loading}>
           {loading ? 'Signing in…' : 'Sign In'}
         </button>
+
+        {slowHint && (
+          <p className={styles.slowHint}>
+            Server is warming up — this can take up to 30 seconds on first load.
+          </p>
+        )}
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ export const API_BASE = import.meta.env.VITE_API_BASE || fallbackAPI
 
 const client = axios.create({
   baseURL: API_BASE,
-  timeout: 15000,
+  timeout: 60000,
 })
 
 // Attach JWT token from localStorage
