@@ -3,14 +3,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import client from '../api/client.js'
 import StatusBadge from '../components/StatusBadge.jsx'
+import { SkeletonRow } from '../components/Skeleton.jsx'
 import ConfirmModal from '../components/ConfirmModal.jsx'
-import Toast from '../components/Toast.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 import styles from './ListPage.module.css'
 
 export default function Projects() {
   const qc = useQueryClient()
+  const addToast = useToast()
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [toast, setToast] = useState(null)
+  const [search, setSearch] = useState('')
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['admin-projects'],
@@ -21,9 +23,9 @@ export default function Projects() {
     mutationFn: id => client.delete(`/api/admin/projects/${id}`),
     onSuccess: () => {
       qc.invalidateQueries(['admin-projects'])
-      setToast({ message: 'Project deleted', type: 'success' })
+      addToast('Project deleted', 'success')
     },
-    onError: () => setToast({ message: 'Delete failed', type: 'error' }),
+    onError: () => addToast('Delete failed', 'error'),
   })
 
   function confirmDelete(project) { setDeleteTarget(project) }
@@ -32,6 +34,11 @@ export default function Projects() {
     setDeleteTarget(null)
   }
 
+  const q = search.toLowerCase()
+  const filtered = projects.filter(p =>
+    p.title?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)
+  )
+
   return (
     <div>
       <div className={styles.header}>
@@ -39,14 +46,27 @@ export default function Projects() {
         <Link to="/projects/new" className={styles.addBtn}>+ Add Project</Link>
       </div>
 
+      <div className={styles.toolbar}>
+        <input
+          className={styles.search}
+          placeholder="Search projects…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          aria-label="Search projects"
+        />
+        {search && <span className={styles.searchCount}>{filtered.length} result{filtered.length !== 1 ? 's' : ''}</span>}
+      </div>
+
       {isLoading ? (
-        <p className={styles.loading}>Loading…</p>
+        <div className={styles.table}>
+          {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={5} />)}
+        </div>
       ) : (
         <div className={styles.table}>
           <div className={`${styles.row} ${styles.thead}`}>
             <span className={styles.title}>Title</span><span>Category</span><span>Status</span><span>Featured</span><span className={styles.actions}>Actions</span>
           </div>
-          {projects.map(p => (
+          {filtered.map(p => (
             <div key={p.id} className={styles.row}>
               <span className={styles.title}>{p.title}</span>
               <span className={styles.muted}>{p.category || '—'}</span>
@@ -58,7 +78,7 @@ export default function Projects() {
               </span>
             </div>
           ))}
-          {projects.length === 0 && <p className={styles.empty}>No projects yet.</p>}
+          {filtered.length === 0 && <p className={styles.empty}>{search ? 'No results found.' : 'No projects yet.'}</p>}
         </div>
       )}
 
@@ -69,7 +89,6 @@ export default function Projects() {
           onCancel={() => setDeleteTarget(null)}
         />
       )}
-      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
   )
 }

@@ -33,12 +33,12 @@ export default function Sidebar({ onClose }) {
             className={styles.brandLogo}
           />
           {onClose && (
-            <button className={styles.closeBtn} onClick={onClose}>×</button>
+            <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">×</button>
           )}
         </div>
       </div>
 
-      <nav className={styles.nav}>
+      <nav className={styles.nav} aria-label="Main navigation">
         {NAV.map(({ to, label }) => (
           <NavLink
             key={to}

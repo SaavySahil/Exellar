@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import client, { API_BASE } from '../api/client.js'
+import client from '../api/client.js'
 import ConfirmModal from '../components/ConfirmModal.jsx'
-import Toast from '../components/Toast.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 import styles from './Applications.module.css'
 
 export default function Applications() {
   const qc = useQueryClient()
+  const addToast = useToast()
   const [selected, setSelected] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [toast, setToast] = useState(null)
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ['admin-applications'],
@@ -20,16 +20,24 @@ export default function Applications() {
     mutationFn: id => client.delete(`/api/admin/applications/${id}`),
     onSuccess: () => {
       qc.invalidateQueries(['admin-applications'])
-      setToast({ message: 'Application deleted', type: 'success' })
+      addToast('Application deleted', 'success')
       if (selected?.id === deleteTarget?.id) setSelected(null)
     },
-    onError: () => setToast({ message: 'Delete failed', type: 'error' }),
+    onError: () => addToast('Delete failed', 'error'),
   })
 
-  function downloadResume(app) {
-    const token = localStorage.getItem('exellar_token')
-
-    window.open(`${API_BASE}/api/admin/applications/${app.id}/resume?token=${token}`, '_blank')
+  async function downloadResume(app) {
+    try {
+      const res = await client.get(`/api/admin/applications/${app.id}/resume`, { responseType: 'blob' })
+      const url = URL.createObjectURL(res.data)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `resume-${app.applicant_name.replace(/\s+/g, '-')}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      addToast('Failed to download resume', 'error')
+    }
   }
 
   return (
@@ -99,16 +107,15 @@ export default function Applications() {
           onCancel={() => setDeleteTarget(null)}
         />
       )}
-      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
   )
 }
 
 function Row({ label, value }) {
   return (
-    <div style={{ marginBottom: '12px' }}>
-      <p style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</p>
-      <p style={{ fontSize: '14px' }}>{value}</p>
+    <div className={styles.rowItem}>
+      <p className={styles.rowLabel}>{label}</p>
+      <p className={styles.rowValue}>{value}</p>
     </div>
   )
 }

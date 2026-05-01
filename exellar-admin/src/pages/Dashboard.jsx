@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import client from '../api/client.js'
+import { SkeletonCard } from '../components/Skeleton.jsx'
 import styles from './Dashboard.module.css'
 
 function useCount(url) {
@@ -10,28 +11,43 @@ function useCount(url) {
   })
 }
 
+const CARD_DEFS = [
+  { label: 'Projects',     url: '/api/admin/projects',     to: '/projects'     },
+  { label: 'Job Listings', url: '/api/admin/jobs',         to: '/jobs'         },
+  { label: 'Articles',     url: '/api/admin/articles',     to: '/articles'     },
+  { label: 'Applications', url: '/api/admin/applications', to: '/applications' },
+]
+
+function StatCard({ label, to, value, isLoading }) {
+  if (isLoading) return <SkeletonCard />
+  return (
+    <Link to={to} className={styles.card}>
+      <span className={styles.count}>{value ?? '—'}</span>
+      <span className={styles.cardLabel}>{label}</span>
+    </Link>
+  )
+}
+
 export default function Dashboard() {
   const projects     = useCount('/api/admin/projects')
   const jobs         = useCount('/api/admin/jobs')
+  const articles     = useCount('/api/admin/articles')
   const applications = useCount('/api/admin/applications')
 
-  const cards = [
-    { label: 'Projects',     value: projects.data,     to: '/projects' },
-    { label: 'Job Listings', value: jobs.data,         to: '/jobs' },
-    { label: 'Applications', value: applications.data, to: '/applications' },
-  ]
+  const results = [projects, jobs, articles, applications]
 
   return (
     <div>
       <h1 className={styles.heading}>Dashboard</h1>
       <div className={styles.grid}>
-        {cards.map(c => (
-          <Link key={c.label} to={c.to} className={styles.card}>
-            <span className={styles.count}>
-              {c.value ?? '—'}
-            </span>
-            <span className={styles.cardLabel}>{c.label}</span>
-          </Link>
+        {CARD_DEFS.map((c, i) => (
+          <StatCard
+            key={c.label}
+            label={c.label}
+            to={c.to}
+            value={results[i].data}
+            isLoading={results[i].isLoading}
+          />
         ))}
       </div>
 
@@ -40,6 +56,7 @@ export default function Dashboard() {
         <div className={styles.btnRow}>
           <Link to="/projects/new" className={styles.action}>+ New Project</Link>
           <Link to="/jobs/new"     className={styles.action}>+ New Job</Link>
+          <Link to="/articles/new" className={styles.action}>+ New Article</Link>
         </div>
       </div>
     </div>

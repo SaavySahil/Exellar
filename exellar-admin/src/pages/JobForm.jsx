@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client from '../api/client.js'
-import Toast from '../components/Toast.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 import styles from './Form.module.css'
 
 const INITIAL = {
@@ -15,8 +15,17 @@ export default function JobForm() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const isEdit = Boolean(id)
+  const addToast = useToast()
   const [form, setForm] = useState(INITIAL)
-  const [toast, setToast] = useState(null)
+  const [errors, setErrors] = useState({})
+
+  function validate() {
+    const e = {}
+    if (!form.title.trim()) e.title = 'Title is required'
+    if (!form.description.trim()) e.description = 'Description is required'
+    setErrors(e)
+    return Object.keys(e).length === 0
+  }
 
   const { data: existing } = useQuery({
     queryKey: ['job', id],
@@ -47,7 +56,7 @@ export default function JobForm() {
       qc.invalidateQueries(['admin-jobs'])
       navigate('/jobs')
     },
-    onError: err => setToast({ message: err.response?.data?.error || 'Save failed', type: 'error' }),
+    onError: err => addToast(err.response?.data?.error || 'Save failed', 'error'),
   })
 
   return (
@@ -58,8 +67,9 @@ export default function JobForm() {
         <div className={styles.row2}>
           <div className={styles.field}>
             <label className={styles.label}>Title *</label>
-            <input className={styles.input} value={form.title}
-              onChange={e => set('title', e.target.value)} required />
+            <input className={`${styles.input} ${errors.title ? styles.inputError : ''}`} value={form.title}
+              onChange={e => { set('title', e.target.value); setErrors(p => ({ ...p, title: '' })) }} />
+            {errors.title && <span className={styles.fieldError}>{errors.title}</span>}
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Department</label>
@@ -86,10 +96,11 @@ export default function JobForm() {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Description</label>
-          <textarea className={styles.textarea} rows={5} value={form.description}
-            onChange={e => set('description', e.target.value)}
+          <label className={styles.label}>Description *</label>
+          <textarea className={`${styles.textarea} ${errors.description ? styles.inputError : ''}`} rows={5} value={form.description}
+            onChange={e => { set('description', e.target.value); setErrors(p => ({ ...p, description: '' })) }}
             placeholder="Describe the role and responsibilities…" />
+          {errors.description && <span className={styles.fieldError}>{errors.description}</span>}
         </div>
 
         <div className={styles.field}>
@@ -109,14 +120,13 @@ export default function JobForm() {
           <button type="button" className={styles.cancel}
             onClick={() => navigate('/jobs')}>Cancel</button>
           <button type="button" className={styles.save}
-            onClick={() => saveMutation.mutate()}
+            onClick={() => validate() && saveMutation.mutate()}
             disabled={saveMutation.isPending}>
             {saveMutation.isPending ? 'Saving…' : 'Save Job'}
           </button>
         </div>
       </div>
 
-      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
   )
 }

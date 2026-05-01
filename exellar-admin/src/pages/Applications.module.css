@@ -79,7 +79,11 @@
 }
 .delBtn:hover { background: rgba(224,82,82,0.1); }
 
-.detailBody { display: flex; flex-direction: column; gap: 4px; }
+.detailBody { display: flex; flex-direction: column; gap: 12px; }
+
+.rowItem { margin-bottom: 0; }
+.rowLabel { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+.rowValue { font-size: 14px; color: var(--text); }
 .section { margin-top: 20px; }
 .sectionLabel { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
 .sectionText { font-size: 14px; line-height: 1.7; white-space: pre-wrap; }

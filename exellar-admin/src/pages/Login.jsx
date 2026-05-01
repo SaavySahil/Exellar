@@ -14,6 +14,9 @@ export default function Login() {
   async function handleSubmit(e) {
     if (e) e.preventDefault()
     setError('')
+    if (!email.trim()) { setError('Email is required'); return }
+    if (!/\S+@\S+\.\S+/.test(email)) { setError('Enter a valid email address'); return }
+    if (!password) { setError('Password is required'); return }
     setLoading(true)
     try {
       await login(email, password)
