@@ -328,3 +328,5 @@ body,html{margin:0;padding:0;width:100%}body{color:#fff;font-weight:400}h1,h2,h3
   visibility: visible !important;
 }
 /* ─────────────────────────────────────────────────────────────────────── */
+
+#home-featured-grid { padding-bottom: 60px; }
