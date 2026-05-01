@@ -120,7 +120,11 @@
         .client-logos-strip::before, .client-logos-strip::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 100vw; height: 1px; background: rgba(0,0,0,0.08); z-index: 1; }
         .client-logos-strip::before { top: 0; }
         .client-logos-strip::after { bottom: 0; }
-    
+
+        /* View All Projects CTA — add space between last card title and the box */
+        #view-all-projects-cta {
+            margin-top: 40px;
+        }
     </style>
     </head>
     <body>
@@ -1157,7 +1161,7 @@
                 </a>
             </div>
     </div>
-    <div class="offices-cta anim-block">
+    <div class="offices-cta anim-block" id="view-all-projects-cta">
         <a href="Projects.html" class="btn-link anim-elem">View All Projects <img aria-hidden="true" src="images/btn-arrow.svg" alt="arrow"></a>
     </div>
     <div class="grid-lines gray">
