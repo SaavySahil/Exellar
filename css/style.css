@@ -330,4 +330,4 @@ body,html{margin:0;padding:0;width:100%}body{color:#fff;font-weight:400}h1,h2,h3
 /* ─────────────────────────────────────────────────────────────────────── */
 
 #home-featured-grid { padding-bottom: 60px; }
-.offices-cta{background-color:#fff;border:1px solid #DBDBDB;display:-webkit-box;display:-ms-flexbox;display:flex;margin:60px auto 0;width:50vw;box-sizing:border-box;position:relative;z-index:5}
+.offices-cta{border-bottom:1px solid #DBDBDB;border-top:1px solid #DBDBDB;display:-webkit-box;display:-ms-flexbox;display:flex;margin:60px auto 0;width:33.333vw;box-sizing:border-box;position:relative;z-index:5}
