@@ -353,3 +353,33 @@ body,html{margin:0;padding:0;width:100%}body{color:#fff;font-weight:400}h1,h2,h3
         margin-right: 33.333vw;
     }
 }
+
+
+.offices-cta {
+    background-image: 
+        linear-gradient(to right, transparent 25vw, #DBDBDB 25vw, #DBDBDB 75vw, transparent 75vw),
+        linear-gradient(to right, transparent 25vw, #DBDBDB 25vw, #DBDBDB 75vw, transparent 75vw);
+    background-size: 100% 1px;
+    background-position: top center, bottom center;
+    background-repeat: no-repeat;
+    border: none !important;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    margin-top: 60px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    position: relative;
+    z-index: 5;
+}
+
+@media (max-width: 1024px) {
+    .offices-cta {
+        background-image: 
+            linear-gradient(to right, transparent 33.333vw, #DBDBDB 33.333vw, #DBDBDB 66.666vw, transparent 66.666vw),
+            linear-gradient(to right, transparent 33.333vw, #DBDBDB 33.333vw, #DBDBDB 66.666vw, transparent 66.666vw);
+    }
+}
